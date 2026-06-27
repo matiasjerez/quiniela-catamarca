@@ -18,7 +18,6 @@ HEADERS = {
 
 def fetch_quiniela(fecha: str):
     url = f"{BASE_URL}?imputacion=0&fecha={fecha}"
-    print(f"[fetch] GET {url}")
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
     return parsear(resp.text, fecha)
@@ -28,7 +27,6 @@ def parsear(html: str, fecha: str):
     soup = BeautifulSoup(html, "html.parser")
     turnos = []
     items = soup.select("#quiniela-Slider .item")
-    print(f"[parsear] fecha={fecha} items encontrados={len(items)}")
 
     for item in items:
         textos = [el.get_text(strip=True) for el in item.find_all(True) if el.get_text(strip=True)]
@@ -63,11 +61,9 @@ def parsear(html: str, fecha: str):
             })
 
     if not turnos:
-        print(f"[parsear] fallback a parsear_texto")
         turnos = parsear_texto(soup, fecha)
 
     turnos.sort(key=lambda t: ORDEN_TURNOS.index(t["nombre"]) if t["nombre"] in ORDEN_TURNOS else 99)
-    print(f"[parsear] turnos encontrados: {[t['nombre'] for t in turnos]}")
     return turnos
 
 
@@ -99,11 +95,28 @@ def parsear_texto(soup, fecha):
     return turnos
 
 
+def deduplicar_turnos(turnos):
+    """Si hay dos entradas del mismo turno, quedarse con la que tiene hora."""
+    vistos = {}
+    for t in turnos:
+        nombre = t["nombre"]
+        if nombre not in vistos:
+            vistos[nombre] = t
+        else:
+            # Preferir el que tiene hora sobre el que no tiene
+            if not vistos[nombre]["hora"] and t["hora"]:
+                vistos[nombre] = t
+    # Reordenar según orden oficial
+    resultado = [vistos[n] for n in ORDEN_TURNOS if n in vistos]
+    return resultado
+
+
 @app.route("/api/quiniela")
 def quiniela_hoy():
     fecha = datetime.now().strftime("%d/%m/%Y")
     try:
         turnos = fetch_quiniela(fecha)
+        turnos = deduplicar_turnos(turnos)
         return jsonify({
             "ok": True,
             "fecha": fecha,
@@ -111,7 +124,6 @@ def quiniela_hoy():
             "actualizado": datetime.now().strftime("%H:%M:%S")
         })
     except Exception as e:
-        print(f"[ERROR quiniela_hoy] {e}")
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
@@ -120,6 +132,7 @@ def quiniela_fecha(fecha):
     fecha_fmt = fecha.replace("-", "/")
     try:
         turnos = fetch_quiniela(fecha_fmt)
+        turnos = deduplicar_turnos(turnos)
         return jsonify({
             "ok": True,
             "fecha": fecha_fmt,
@@ -127,14 +140,12 @@ def quiniela_fecha(fecha):
             "actualizado": datetime.now().strftime("%H:%M:%S")
         })
     except Exception as e:
-        print(f"[ERROR quiniela_fecha] {e}")
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
 @app.route("/api/cabezas")
 def cabezas_ultimos_dias():
     resultado = []
-    errores = []
     dia = datetime.now()
     intentos = 0
 
@@ -145,9 +156,9 @@ def cabezas_ultimos_dias():
             continue
 
         fecha_str = dia.strftime("%d/%m/%Y")
-        print(f"[cabezas] intentando fecha={fecha_str}")
         try:
             turnos = fetch_quiniela(fecha_str)
+            turnos = deduplicar_turnos(turnos)
             if turnos:
                 cabezas = [
                     {"turno": t["nombre"], "numero": t["numeros"][0], "hora": t["hora"]}
@@ -158,23 +169,13 @@ def cabezas_ultimos_dias():
                     "dia_semana": ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][dia.weekday()],
                     "cabezas": cabezas
                 })
-                print(f"[cabezas] OK fecha={fecha_str} cabezas={len(cabezas)}")
-            else:
-                print(f"[cabezas] sin turnos para fecha={fecha_str}")
         except Exception as e:
-            msg = f"fecha={fecha_str} error={str(e)}"
-            print(f"[cabezas] ERROR {msg}")
-            errores.append(msg)
+            print(f"[cabezas] ERROR fecha={fecha_str}: {e}")
 
         dia -= timedelta(days=1)
         intentos += 1
 
-    return jsonify({
-        "ok": True,
-        "dias": resultado,
-        "debug_errores": errores,
-        "debug_intentos": intentos
-    })
+    return jsonify({"ok": True, "dias": resultado})
 
 
 @app.route("/", defaults={"path": ""})
