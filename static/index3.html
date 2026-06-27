@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agencia 553 — Quiniela Catamarca</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #0a0d14;
+      --surface: #111620;
+      --surface2: #161d2e;
+      --border: #1e2a42;
+      --accent: #e8b84b;
+      --accent-dark: #b8891f;
+      --text: #eef0f6;
+      --muted: #5a6680;
+      --green: #2ecc71;
+      --gold1: #e8b84b;
+      --gold2: #f5d07a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(90deg, #0a0d14 0%, #111d35 50%, #0a0d14 100%);
+      border-bottom: 3px solid var(--accent);
+      padding: 0 3vw;
+      height: 10vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .agencia-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1vw;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .agencia-nombre {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 3.5vw;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 0 30px rgba(232,184,75,0.3);
+    }
+
+    .agencia-numero {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2vw;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .agencia-numero span {
+      color: var(--text);
+      font-size: 1.4vw;
+    }
+
+    .header-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .header-center .provincia {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1vw;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .header-center .quiniela-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.2vw;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .header-right {
+      text-align: right;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      font-size: 0.8vw;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .live-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100%{opacity:1;transform:scale(1)}
+      50%{opacity:.5;transform:scale(.8)}
+    }
+
+    .fecha-actual {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.4vw;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── DATE PICKER ── */
+    .date-picker-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1vh 3vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .date-picker-bar label {
+      font-size: 0.9vw;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    input[type="date"] {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 6px 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 1vw;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="date"]:focus { border-color: var(--accent); }
+
+    .btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1vw;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      padding: 6px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-buscar { background: var(--accent); color: #000; }
+    .btn-buscar:hover { background: var(--gold2); }
+    .btn-hoy { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-hoy:hover { background: var(--accent); color: #000; }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      display: grid;
+      grid-template-rows: auto auto;
+      padding: 2vh 2vw;
+      gap: 2vh;
+      min-height: 88vh;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 1.5vh;
+    }
+
+    .section-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.6vw;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+
+    /* ── CABEZAS TABLE ── */
+    .cabezas-wrap { overflow-x: auto; }
+
+    .cabezas-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .cabezas-table thead tr {
+      background: var(--surface2);
+    }
+
+    .cabezas-table th {
+      padding: 1.2vh 1.5vw;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1vw;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .cabezas-table th.col-turno { text-align: left; }
+
+    .cabezas-table th .dia-nombre {
+      display: block;
+      font-size: 1.1vw;
+      color: var(--text);
+    }
+
+    .cabezas-table th .dia-fecha {
+      display: block;
+      font-size: 0.8vw;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .cabezas-table td {
+      padding: 1.2vh 1.5vw;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2vw;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+
+    .cabezas-table td.col-turno {
+      text-align: left;
+      font-size: 1vw;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+
+    .cabezas-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .cabezas-table tr:hover td { background: rgba(232,184,75,0.05); }
+
+    .cabezas-table td.hoy-col {
+      color: var(--accent);
+      font-size: 2.3vw;
+      text-shadow: 0 0 20px rgba(232,184,75,0.4);
+    }
+
+    .cabezas-table th.hoy-col {
+      color: var(--accent);
+      background: rgba(232,184,75,0.08);
+    }
+
+    td.vacio { color: var(--muted); font-size: 1vw; }
+
+    /* ── TURNOS GRID ── */
+    .turnos-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.2vw;
+    }
+
+    .turno-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .turno-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(232,184,75,0.1);
+    }
+
+    .turno-header {
+      background: linear-gradient(90deg, var(--surface2), var(--border));
+      padding: 1vh 1vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .turno-nombre {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.1vw;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .turno-hora {
+      font-size: 0.8vw;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .turno-sorteo {
+      font-size: 0.7vw;
+      color: var(--muted);
+      padding: 4px 1vw 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .numeros-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      flex: 1;
+    }
+
+    .numero-item {
+      background: var(--surface);
+      padding: 0.8vh 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .numero-pos {
+      font-size: 0.55vw;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 1px;
+    }
+
+    .numero-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.4vw;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .numero-item:nth-child(1) { background: rgba(232,184,75,0.06); }
+    .numero-item:nth-child(1) .numero-val { color: var(--accent); font-size: 1.8vw; text-shadow: 0 0 15px rgba(232,184,75,0.5); }
+    .numero-item:nth-child(2) .numero-val { color: #c8d0e8; font-size: 1.6vw; }
+    .numero-item:nth-child(3) .numero-val { color: #9aa3bd; font-size: 1.5vw; }
+
+    /* ── STATUS ── */
+    .status-msg {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      grid-column: 1/-1;
+    }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .refresh-btn {
+      background: var(--accent); color: #000; border: none;
+      padding: 8px 20px; font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 1rem; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer; border-radius: 2px;
+      margin-top: 12px; transition: background 0.2s;
+    }
+
+    .refresh-btn:hover { background: var(--gold2); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5vh 3vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+    }
+
+    .footer-agencia {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1vw;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .footer-source {
+      font-size: 0.8vw;
+      color: var(--muted);
+    }
+
+    .footer-source a { color: var(--muted); text-decoration: none; }
+
+    .footer-tel {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1vw;
+      color: var(--text);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <span class="agencia-label">Quiniela Catamarca</span>
+    <span class="agencia-nombre">Agencia 553</span>
+    <span class="agencia-numero">☎ <span id="tel">3834819298</span></span>
+  </div>
+
+  <div class="header-center">
+    <span class="provincia">Provincia de Catamarca</span>
+    <div class="quiniela-title">Resultados Oficiales</div>
+  </div>
+
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <span id="last-update">Cargando…</span>
+    </div>
+    <div class="fecha-actual" id="fecha-actual">—</div>
+  </div>
+</header>
+
+<!-- DATE PICKER -->
+<div class="date-picker-bar">
+  <label for="fecha-input">Consultar fecha:</label>
+  <input type="date" id="fecha-input" />
+  <button class="btn btn-buscar" onclick="buscarFecha()">Ver resultados</button>
+  <button class="btn btn-hoy" onclick="irAHoy()">Hoy</button>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- CABEZAS -->
+  <div>
+    <div class="section-header"><h2>Cabezas — últimos 5 días</h2></div>
+    <div class="cabezas-wrap">
+      <div id="cabezas-container">
+        <div style="color:var(--muted);padding:20px 0;text-align:center">
+          <div class="spinner" style="margin-bottom:8px"></div>Cargando historial…
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div>
+    <div class="section-header"><h2 id="titulo-resultados">Resultados del día</h2></div>
+    <div class="turnos-grid" id="turnos-grid">
+      <div class="status-msg">
+        <div class="spinner"></div>
+        <p>Obteniendo resultados…</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-agencia">Agencia 553 — Ca.Pre.S.Ca Catamarca</div>
+  <div class="footer-source">Datos: <a href="https://cat.lotemovil.com.ar" target="_blank">cat.lotemovil.com.ar</a></div>
+  <div class="footer-tel">☎ 3834819298</div>
+</footer>
+
+<script>
+  const API_BASE = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/quiniela"
+    : "/api/quiniela";
+
+  const API_CABEZAS = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/cabezas"
+    : "/api/cabezas";
+
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                 'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const ORDEN_TURNOS = ["La Primera","Matutino","Vespertino","De la Tarde","Nocturno"];
+
+  function hoyISO() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function isoADisplay(iso) {
+    const [yyyy,mm,dd] = iso.split('-');
+    return `${parseInt(dd)} de ${MESES[parseInt(mm)-1]} de ${yyyy}`;
+  }
+
+  function isoAApi(iso) {
+    const [yyyy,mm,dd] = iso.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
+  function ddmmyyyyAISO(fecha) {
+    // "27/06/2026" → "2026-06-27"
+    const [dd,mm,yyyy] = fecha.split('/');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // ── CABEZAS ──────────────────────────────
+  async function cargarCabezas() {
+    try {
+      const res = await fetch(API_CABEZAS);
+      const data = await res.json();
+      renderCabezas(data.dias || []);
+    } catch(e) {
+      document.getElementById('cabezas-container').innerHTML =
+        `<p style="color:var(--muted);padding:16px">No se pudo cargar el historial.</p>`;
+    }
+  }
+
+  function renderCabezas(dias) {
+    if (!dias.length) {
+      document.getElementById('cabezas-container').innerHTML =
+        `<p style="color:var(--muted);padding:16px">Sin datos históricos.</p>`;
+      return;
+    }
+
+    const turnosSet = new Set();
+    dias.forEach(d => d.cabezas.forEach(c => turnosSet.add(c.turno)));
+    const turnos = ORDEN_TURNOS.filter(t => turnosSet.has(t));
+    const hoyStr = hoyISO();
+
+    const thead = `<thead><tr>
+      <th class="col-turno">Turno</th>
+      ${dias.map(d => {
+        const iso = ddmmyyyyAISO(d.fecha);
+        const esHoy = iso === hoyStr;
+        return `<th class="${esHoy ? 'hoy-col' : ''}">
+          <span class="dia-nombre">${d.dia_semana}${esHoy ? ' ★' : ''}</span>
+          <span class="dia-fecha">${d.fecha.substring(0,5)}</span>
+        </th>`;
+      }).join('')}
+    </tr></thead>`;
+
+    const tbody = `<tbody>
+      ${turnos.map(turno => `
+        <tr>
+          <td class="col-turno">${turno}</td>
+          ${dias.map(d => {
+            const iso = ddmmyyyyAISO(d.fecha);
+            const esHoy = iso === hoyStr;
+            const c = d.cabezas.find(x => x.turno === turno);
+            return c
+              ? `<td class="${esHoy ? 'hoy-col' : ''}">${c.numero}</td>`
+              : `<td class="vacio">—</td>`;
+          }).join('')}
+        </tr>
+      `).join('')}
+    </tbody>`;
+
+    document.getElementById('cabezas-container').innerHTML =
+      `<table class="cabezas-table">${thead}${tbody}</table>`;
+  }
+
+  // ── RESULTADOS ───────────────────────────
+  function renderTurnos(data, fechaISO) {
+    document.getElementById('fecha-actual').textContent = isoADisplay(fechaISO);
+    document.getElementById('last-update').textContent = `Actualizado ${data.actualizado}`;
+
+    const esHoy = fechaISO === hoyISO();
+    document.getElementById('titulo-resultados').textContent =
+      esHoy ? 'Resultados de hoy' : `Resultados del ${isoADisplay(fechaISO)}`;
+
+    const grid = document.getElementById('turnos-grid');
+
+    if (!data.turnos || !data.turnos.length) {
+      grid.innerHTML = `
+        <div class="status-msg">
+          <p>No hay resultados disponibles para esta fecha.</p>
+          <button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = data.turnos.map(t => `
+      <div class="turno-card">
+        <div class="turno-header">
+          <span class="turno-nombre">${t.nombre}</span>
+          <span class="turno-hora">${t.hora}</span>
+        </div>
+        ${t.sorteo ? `<div class="turno-sorteo">Sorteo N° ${t.sorteo}</div>` : ''}
+        <div class="numeros-grid">
+          ${t.numeros.slice(0,20).map((n,i) => `
+            <div class="numero-item">
+              <span class="numero-pos">${i+1}°</span>
+              <span class="numero-val">${n}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function cargar(fechaISO) {
+    document.getElementById('turnos-grid').innerHTML = `
+      <div class="status-msg">
+        <div class="spinner"></div>
+        <p>Obteniendo resultados…</p>
+      </div>`;
+
+    const esHoy = fechaISO === hoyISO();
+    const url = esHoy ? API_BASE : `${API_BASE}/${isoAApi(fechaISO)}`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      renderTurnos(data, fechaISO);
+    } catch(e) {
+      document.getElementById('turnos-grid').innerHTML = `
+        <div class="status-msg">
+          <p>⚠️ No se pudo cargar.<br><small>${e.message}</small></p>
+          <button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button>
+        </div>`;
+      document.getElementById('last-update').textContent = 'Error';
+    }
+  }
+
+  function buscarFecha() {
+    const val = document.getElementById('fecha-input').value;
+    if (!val) return;
+    cargar(val);
+  }
+
+  function irAHoy() {
+    const hoy = hoyISO();
+    document.getElementById('fecha-input').value = hoy;
+    cargar(hoy);
+    clearInterval(window._refreshInterval);
+    window._refreshInterval = setInterval(() => cargar(hoyISO()), 10 * 60 * 1000);
+  }
+
+  // Init
+  const hoy = hoyISO();
+  document.getElementById('fecha-input').value = hoy;
+  document.getElementById('fecha-input').max = hoy;
+
+  cargar(hoy);
+  cargarCabezas();
+
+  window._refreshInterval = setInterval(() => {
+    const f = document.getElementById('fecha-input').value;
+    if (f === hoyISO()) cargar(hoyISO());
+  }, 10 * 60 * 1000);
+</script>
+
+</body>
+</html>
