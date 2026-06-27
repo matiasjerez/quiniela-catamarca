@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiniela Catamarca</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #0e1117;
+      --surface: #161b27;
+      --border: #222b3e;
+      --accent: #e8b84b;
+      --text: #e8eaf0;
+      --muted: #6b7794;
+      --green: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 2px solid var(--accent);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.6rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .logo span { color: var(--accent); }
+
+    .live-badge { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)} }
+
+    .date-bar { background: var(--accent); color: #000; text-align: center; padding: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    .date-picker-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .date-picker-bar label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+    input[type="date"] {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 3px; padding: 7px 12px; font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; cursor: pointer; outline: none; transition: border-color 0.2s;
+    }
+    input[type="date"]:focus { border-color: var(--accent); }
+
+    .btn-hoy { background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 7px 16px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .btn-hoy:hover { background: var(--accent); color: #000; }
+
+    .btn-buscar { background: var(--accent); color: #000; border: none; border-radius: 3px; padding: 7px 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+    .btn-buscar:hover { background: #f0c55a; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 2rem; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 2px; background: var(--border); }
+
+    /* CABEZAS TABLA */
+    .cabezas-wrap { margin-bottom: 48px; overflow-x: auto; }
+
+    .cabezas-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .cabezas-table th {
+      background: var(--border);
+      padding: 10px 14px;
+      text-align: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .cabezas-table th.col-turno { text-align: left; }
+
+    .cabezas-table td {
+      padding: 10px 14px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .cabezas-table td.col-turno {
+      text-align: left;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .cabezas-table tr:hover td { background: #1a2035; }
+
+    .cabezas-table td.vacio { color: var(--muted); font-size: 0.85rem; font-family: 'Barlow', sans-serif; font-weight: 400; }
+
+    .fecha-col { font-size: 0.78rem; color: var(--muted); display: block; font-family: 'Barlow', sans-serif; font-weight: 400; }
+
+    /* RESULTADOS GRID */
+    .turnos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+    .turno-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
+    .turno-card:hover { border-color: var(--accent); }
+
+    .turno-header { background: var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .turno-nombre { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+    .turno-hora { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .turno-sorteo { font-size: 0.7rem; color: var(--muted); padding: 4px 16px 8px; }
+
+    .numeros-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border-top: 1px solid var(--border); }
+    .numero-item { background: var(--surface); padding: 10px 6px; text-align: center; }
+    .numero-pos { font-size: 0.6rem; color: var(--muted); display: block; margin-bottom: 2px; }
+    .numero-val { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+    .numero-item:nth-child(1) .numero-val { color: var(--accent); font-size: 1.7rem; }
+    .numero-item:nth-child(2) .numero-val { color: #c0c8e0; font-size: 1.5rem; }
+    .numero-item:nth-child(3) .numero-val { color: #9aa3bd; }
+
+    .status-msg { text-align: center; padding: 60px 20px; color: var(--muted); grid-column: 1/-1; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .refresh-btn { background: var(--accent); color: #000; border: none; padding: 10px 24px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 2px; margin-top: 16px; transition: background 0.2s; }
+    .refresh-btn:hover { background: #f0c55a; }
+
+    footer { border-top: 1px solid var(--border); padding: 20px; text-align: center; color: var(--muted); font-size: 0.8rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Quiniela <span>Catamarca</span></div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    <span id="last-update">Cargando…</span>
+  </div>
+</header>
+
+<div class="date-bar" id="date-bar">—</div>
+
+<div class="date-picker-bar">
+  <label for="fecha-input">Fecha:</label>
+  <input type="date" id="fecha-input" />
+  <button class="btn-buscar" onclick="buscarFecha()">Ver resultados</button>
+  <button class="btn-hoy" onclick="irAHoy()">Hoy</button>
+</div>
+
+<main>
+
+  <!-- CABEZAS ÚLTIMOS 5 DÍAS -->
+  <div class="section-title">Cabezas — últimos 5 días</div>
+  <div class="cabezas-wrap">
+    <div id="cabezas-container">
+      <div style="color:var(--muted);padding:20px 0"><div class="spinner" style="margin-bottom:8px"></div>Cargando historial…</div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS DEL DÍA -->
+  <div class="section-title">Resultados del día</div>
+  <div class="turnos-grid" id="turnos-grid">
+    <div class="status-msg">
+      <div class="spinner"></div>
+      <p>Obteniendo resultados…</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Datos obtenidos de <a href="https://cat.lotemovil.com.ar" target="_blank">cat.lotemovil.com.ar</a> · Ca.Pre.S.Ca Catamarca
+</footer>
+
+<script>
+  const API_BASE = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/quiniela"
+    : "/api/quiniela";
+
+  const API_CABEZAS = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/cabezas"
+    : "/api/cabezas";
+
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                 'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  const ORDEN_TURNOS = ["La Primera", "Matutino", "Vespertino", "De la Tarde", "Nocturno"];
+
+  function hoyISO() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function isoADisplay(iso) {
+    const [yyyy, mm, dd] = iso.split('-');
+    return `${parseInt(dd)} de ${MESES[parseInt(mm)-1]} de ${yyyy}`;
+  }
+
+  function isoAApi(iso) {
+    const [yyyy, mm, dd] = iso.split('-');
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
+  // ── CABEZAS ──────────────────────────────────────────
+  async function cargarCabezas() {
+    try {
+      const res = await fetch(API_CABEZAS);
+      const data = await res.json();
+      renderCabezas(data.dias || []);
+    } catch(e) {
+      document.getElementById('cabezas-container').innerHTML =
+        `<p style="color:var(--muted)">No se pudo cargar el historial.</p>`;
+    }
+  }
+
+  function renderCabezas(dias) {
+    if (!dias.length) {
+      document.getElementById('cabezas-container').innerHTML =
+        `<p style="color:var(--muted)">Sin datos históricos.</p>`;
+      return;
+    }
+
+    // Encabezados: turnos que aparecen
+    const turnosSet = new Set();
+    dias.forEach(d => d.cabezas.forEach(c => turnosSet.add(c.turno)));
+    const turnos = ORDEN_TURNOS.filter(t => turnosSet.has(t));
+
+    const thead = `<thead><tr>
+      <th class="col-turno">Turno</th>
+      ${dias.map(d => `<th>${d.dia_semana}<span class="fecha-col">${d.fecha.substring(0,5)}</span></th>`).join('')}
+    </tr></thead>`;
+
+    const tbody = `<tbody>
+      ${turnos.map(turno => `
+        <tr>
+          <td class="col-turno">${turno}</td>
+          ${dias.map(d => {
+            const c = d.cabezas.find(x => x.turno === turno);
+            return c
+              ? `<td>${c.numero}</td>`
+              : `<td class="vacio">—</td>`;
+          }).join('')}
+        </tr>
+      `).join('')}
+    </tbody>`;
+
+    document.getElementById('cabezas-container').innerHTML =
+      `<table class="cabezas-table">${thead}${tbody}</table>`;
+  }
+
+  // ── RESULTADOS DEL DÍA ───────────────────────────────
+  function renderTurnos(data, fechaISO) {
+    document.getElementById('date-bar').textContent = `Sorteos del ${isoADisplay(fechaISO)}`;
+    document.getElementById('last-update').textContent = `Actualizado ${data.actualizado}`;
+
+    const grid = document.getElementById('turnos-grid');
+
+    if (!data.turnos || !data.turnos.length) {
+      grid.innerHTML = `
+        <div class="status-msg">
+          <p>No hay resultados disponibles para esta fecha.</p>
+          <button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = data.turnos.map(t => `
+      <div class="turno-card">
+        <div class="turno-header">
+          <span class="turno-nombre">${t.nombre}</span>
+          <span class="turno-hora">${t.hora}</span>
+        </div>
+        ${t.sorteo ? `<div class="turno-sorteo">Sorteo N° ${t.sorteo}</div>` : ''}
+        <div class="numeros-grid">
+          ${t.numeros.slice(0,20).map((n,i) => `
+            <div class="numero-item">
+              <span class="numero-pos">${i+1}°</span>
+              <span class="numero-val">${n}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function cargar(fechaISO) {
+    document.getElementById('turnos-grid').innerHTML = `
+      <div class="status-msg">
+        <div class="spinner"></div>
+        <p>Obteniendo resultados…</p>
+      </div>`;
+
+    const esHoy = fechaISO === hoyISO();
+    const url = esHoy ? API_BASE : `${API_BASE}/${isoAApi(fechaISO)}`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      renderTurnos(data, fechaISO);
+    } catch(e) {
+      document.getElementById('turnos-grid').innerHTML = `
+        <div class="status-msg">
+          <p>⚠️ No se pudo cargar.<br><small>${e.message}</small></p>
+          <button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button>
+        </div>`;
+      document.getElementById('last-update').textContent = 'Error';
+    }
+  }
+
+  function buscarFecha() {
+    const val = document.getElementById('fecha-input').value;
+    if (!val) return;
+    cargar(val);
+  }
+
+  function irAHoy() {
+    const hoy = hoyISO();
+    document.getElementById('fecha-input').value = hoy;
+    cargar(hoy);
+    clearInterval(window._refreshInterval);
+    window._refreshInterval = setInterval(() => cargar(hoyISO()), 10 * 60 * 1000);
+  }
+
+  // Init
+  const hoy = hoyISO();
+  document.getElementById('fecha-input').value = hoy;
+  document.getElementById('fecha-input').max = hoy;
+
+  cargar(hoy);
+  cargarCabezas();
+
+  window._refreshInterval = setInterval(() => {
+    const f = document.getElementById('fecha-input').value;
+    if (f === hoyISO()) cargar(hoyISO());
+  }, 10 * 60 * 1000);
+</script>
+
+</body>
+</html>
