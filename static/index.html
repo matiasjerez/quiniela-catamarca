@@ -26,215 +26,176 @@
     header {
       background: linear-gradient(90deg, #0a0d14 0%, #111d35 50%, #0a0d14 100%);
       border-bottom: 3px solid var(--accent);
-      padding: 0 3vw;
-      height: 10vh;
+      padding: 0 2.5vw;
+      height: 9vh;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
     }
 
-    .header-left { display: flex; flex-direction: column; line-height: 1; }
-    .agencia-label { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1vw; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); }
-    .agencia-nombre { font-family: 'Barlow Condensed', sans-serif; font-size: 3.5vw; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 30px rgba(232,184,75,0.3); }
-    .agencia-numero { font-family: 'Barlow Condensed', sans-serif; font-size: 1.2vw; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); margin-top: 2px; }
-    .agencia-numero span { color: var(--text); font-size: 1.4vw; }
+    .header-left { display: flex; flex-direction: column; line-height: 1.1; }
+    .agencia-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9vw; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); }
+    .agencia-nombre { font-family: 'Barlow Condensed', sans-serif; font-size: 3vw; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 30px rgba(232,184,75,0.3); }
+    .agencia-numero { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1vw; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); margin-top: 1px; }
+    .agencia-numero span { color: var(--text); }
 
     .header-center { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
-    .header-center .provincia { font-family: 'Barlow Condensed', sans-serif; font-size: 1vw; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
-    .header-center .quiniela-title { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2vw; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
+    .header-center .provincia { font-family: 'Barlow Condensed', sans-serif; font-size: 0.85vw; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+    .header-center .quiniela-title { font-family: 'Barlow Condensed', sans-serif; font-size: 2vw; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
 
     .header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-    .live-badge { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 0.8vw; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-    .live-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+    .live-badge { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 0.75vw; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-    .fecha-actual { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4vw; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+    .fecha-actual { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3vw; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
 
-    /* ── MODO TV BUTTON ── */
     .btn-tv {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      padding: 6px 18px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900;
-      font-size: 1vw;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.2s, transform 0.1s;
+      background: var(--accent); color: #000; border: none; border-radius: 4px;
+      padding: 5px 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 0.9vw; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+      display: flex; align-items: center; gap: 5px; transition: background 0.2s;
     }
-    .btn-tv:hover { background: var(--gold2); transform: scale(1.02); }
-    .btn-tv .icon { font-size: 1.1vw; }
+    .btn-tv:hover { background: var(--gold2); }
 
     /* ── DATE PICKER ── */
     .date-picker-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 1vh 3vw;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      transition: all 0.3s;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0.8vh 2.5vw; display: flex; align-items: center; justify-content: center; gap: 14px;
     }
-    .date-picker-bar label { font-size: 0.9vw; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-    input[type="date"] { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 6px 14px; font-family: 'Barlow', sans-serif; font-size: 1vw; cursor: pointer; outline: none; transition: border-color 0.2s; }
+    .date-picker-bar label { font-size: 0.85vw; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    input[type="date"] { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 5px 12px; font-family: 'Barlow', sans-serif; font-size: 0.9vw; cursor: pointer; outline: none; }
     input[type="date"]:focus { border-color: var(--accent); }
-    .btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1vw; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 3px; padding: 6px 20px; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9vw; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 3px; padding: 5px 18px; cursor: pointer; border: none; }
     .btn-buscar { background: var(--accent); color: #000; }
     .btn-buscar:hover { background: var(--gold2); }
     .btn-hoy { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
     .btn-hoy:hover { background: var(--accent); color: #000; }
 
     /* ── MAIN ── */
-    main { padding: 2vh 2vw; display: flex; flex-direction: column; gap: 2vh; }
+    main { padding: 1.5vh 2vw; display: flex; flex-direction: column; gap: 1.5vh; }
 
-    .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 1.2vh; }
-    .section-header h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.6vw; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); white-space: nowrap; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 0.8vh; }
+    .section-header h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.3vw; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); white-space: nowrap; }
     .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
-    /* ── CABEZAS ── */
+    /* ── CABEZAS compacta ── */
     .cabezas-wrap { overflow-x: auto; }
     .cabezas-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); }
     .cabezas-table thead tr { background: var(--surface2); }
-    .cabezas-table th { padding: 1vh 1.5vw; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1vw; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: center; border-bottom: 2px solid var(--accent); }
+    .cabezas-table th { padding: 0.6vh 1.2vw; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.8vw; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; border-bottom: 2px solid var(--accent); }
     .cabezas-table th.col-turno { text-align: left; }
-    .cabezas-table th .dia-nombre { display: block; font-size: 1.1vw; color: var(--text); }
-    .cabezas-table th .dia-fecha { display: block; font-size: 0.8vw; color: var(--muted); font-weight: 400; }
-    .cabezas-table td { padding: 0.9vh 1.5vw; text-align: center; border-bottom: 1px solid var(--border); font-family: 'Barlow Condensed', sans-serif; font-size: 2vw; font-weight: 700; color: var(--text); }
-    .cabezas-table td.col-turno { text-align: left; font-size: 1vw; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+    .cabezas-table th .dia-nombre { display: block; font-size: 0.9vw; color: var(--text); }
+    .cabezas-table th .dia-fecha { display: block; font-size: 0.7vw; color: var(--muted); font-weight: 400; }
+    .cabezas-table td { padding: 0.5vh 1.2vw; text-align: center; border-bottom: 1px solid var(--border); font-family: 'Barlow Condensed', sans-serif; font-size: 1.5vw; font-weight: 700; color: var(--text); }
+    .cabezas-table td.col-turno { text-align: left; font-size: 0.8vw; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
     .cabezas-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
-    .cabezas-table tr:hover td { background: rgba(232,184,75,0.05); }
-    .cabezas-table td.hoy-col { color: var(--accent); font-size: 2.3vw; text-shadow: 0 0 20px rgba(232,184,75,0.4); }
+    .cabezas-table tr:hover td { background: rgba(232,184,75,0.04); }
+    .cabezas-table td.hoy-col { color: var(--accent); font-size: 1.8vw; text-shadow: 0 0 15px rgba(232,184,75,0.4); }
     .cabezas-table th.hoy-col { color: var(--accent); background: rgba(232,184,75,0.08); }
-    td.vacio { color: var(--muted); font-size: 1vw; }
+    td.vacio { color: var(--muted); font-size: 0.85vw; }
 
-    /* ── TURNOS ── */
-    .turnos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2vw; }
+    /* ── TURNOS GRID — protagonistas ── */
+    .turnos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1vw; }
+
     .turno-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: border-color 0.2s; }
-    .turno-card:hover { border-color: var(--accent); }
-    .turno-header { background: linear-gradient(90deg, var(--surface2), var(--border)); padding: 0.8vh 1vw; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); }
-    .turno-nombre { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.1vw; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
-    .turno-hora { font-size: 0.8vw; color: var(--muted); }
-    .turno-sorteo { font-size: 0.7vw; color: var(--muted); padding: 3px 1vw 5px; border-bottom: 1px solid var(--border); }
+    .turno-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(232,184,75,0.1); }
+
+    .turno-header { background: linear-gradient(90deg, var(--surface2), var(--border)); padding: 1vh 1vw; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); }
+    .turno-nombre { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.4vw; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+    .turno-hora { font-size: 1vw; color: var(--muted); font-weight: 600; }
+    .turno-sorteo { font-size: 0.75vw; color: var(--muted); padding: 4px 1vw 5px; border-bottom: 1px solid var(--border); }
+
     .numeros-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); flex: 1; }
-    .numero-item { background: var(--surface); padding: 0.7vh 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .numero-pos { font-size: 0.55vw; color: var(--muted); display: block; margin-bottom: 1px; }
-    .numero-val { font-family: 'Barlow Condensed', sans-serif; font-size: 1.4vw; font-weight: 700; color: var(--text); line-height: 1; }
-    .numero-item:nth-child(1) { background: rgba(232,184,75,0.06); }
-    .numero-item:nth-child(1) .numero-val { color: var(--accent); font-size: 1.8vw; text-shadow: 0 0 15px rgba(232,184,75,0.5); }
-    .numero-item:nth-child(2) .numero-val { color: #c8d0e8; font-size: 1.6vw; }
-    .numero-item:nth-child(3) .numero-val { color: #9aa3bd; font-size: 1.5vw; }
+    .numero-item { background: var(--surface); padding: 1.1vh 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .numero-pos { font-size: 0.65vw; color: var(--muted); display: block; margin-bottom: 2px; }
+    .numero-val { font-family: 'Barlow Condensed', sans-serif; font-size: 1.9vw; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: 0.02em; }
+
+    /* Primeros 3 puestos destacados */
+    .numero-item:nth-child(1) { background: rgba(232,184,75,0.08); }
+    .numero-item:nth-child(1) .numero-val { color: var(--accent); font-size: 2.6vw; text-shadow: 0 0 20px rgba(232,184,75,0.6); }
+    .numero-item:nth-child(1) .numero-pos { color: var(--accent); font-size: 0.7vw; }
+    .numero-item:nth-child(2) .numero-val { color: #d0d8f0; font-size: 2.2vw; }
+    .numero-item:nth-child(3) .numero-val { color: #a0aac0; font-size: 2vw; }
 
     .status-msg { text-align: center; padding: 40px; color: var(--muted); grid-column: 1/-1; }
     .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .refresh-btn { background: var(--accent); color: #000; border: none; padding: 8px 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 2px; margin-top: 12px; transition: background 0.2s; }
+    .refresh-btn { background: var(--accent); color: #000; border: none; padding: 8px 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; border-radius: 2px; margin-top: 12px; }
     .refresh-btn:hover { background: var(--gold2); }
 
     /* ── FOOTER ── */
-    footer { border-top: 1px solid var(--border); padding: 1.5vh 3vw; display: flex; justify-content: space-between; align-items: center; background: var(--surface); }
-    .footer-agencia { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1vw; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
-    .footer-source { font-size: 0.8vw; color: var(--muted); }
+    footer { border-top: 1px solid var(--border); padding: 1.2vh 2.5vw; display: flex; justify-content: space-between; align-items: center; background: var(--surface); }
+    .footer-agencia { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9vw; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .footer-source { font-size: 0.75vw; color: var(--muted); }
     .footer-source a { color: var(--muted); text-decoration: none; }
-    .footer-tel { font-family: 'Barlow Condensed', sans-serif; font-size: 1vw; color: var(--text); letter-spacing: 0.08em; }
+    .footer-tel { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9vw; color: var(--text); letter-spacing: 0.08em; }
 
-    /* ══════════════════════════════════════
+    /* ══════════════════════════════
        MODO TV
-    ══════════════════════════════════════ */
-    body.modo-tv {
-      overflow: hidden;
-      height: 100vh;
-    }
+    ══════════════════════════════ */
+    body.modo-tv { overflow: hidden; height: 100vh; }
 
-    body.modo-tv header {
-      height: 8vh;
-    }
-
-    body.modo-tv .agencia-nombre { font-size: 2.8vw; }
-    body.modo-tv .agencia-label { font-size: 0.9vw; }
-    body.modo-tv .agencia-numero { font-size: 1vw; }
-    body.modo-tv .quiniela-title { font-size: 1.8vw; }
-    body.modo-tv .fecha-actual { font-size: 1.2vw; }
-
+    body.modo-tv header { height: 8vh; }
     body.modo-tv .date-picker-bar { display: none; }
+    body.modo-tv .btn-tv { display: none; }
 
     body.modo-tv main {
-      height: calc(100vh - 8vh - 5vh);
+      height: calc(100vh - 8vh - 4.5vh);
       overflow: hidden;
-      padding: 1vh 1.5vw;
-      gap: 1vh;
+      padding: 0.8vh 1.5vw;
+      gap: 0.8vh;
       display: grid;
-      grid-template-rows: auto 1fr;
+      /* cabezas toma ~28%, turnos toma el resto */
+      grid-template-rows: 28% 1fr;
     }
 
-    body.modo-tv .section-header { margin-bottom: 0.5vh; }
-    body.modo-tv .section-header h2 { font-size: 1.2vw; }
+    /* Cabezas aún más compacta en modo TV */
+    body.modo-tv .section-header { margin-bottom: 0.3vh; }
+    body.modo-tv .section-header h2 { font-size: 0.9vw; }
+    body.modo-tv .cabezas-table th { padding: 0.3vh 0.8vw; font-size: 0.7vw; }
+    body.modo-tv .cabezas-table th .dia-nombre { font-size: 0.75vw; }
+    body.modo-tv .cabezas-table th .dia-fecha { font-size: 0.6vw; }
+    body.modo-tv .cabezas-table td { padding: 0.35vh 0.8vw; font-size: 1.2vw; }
+    body.modo-tv .cabezas-table td.col-turno { font-size: 0.7vw; }
+    body.modo-tv .cabezas-table td.hoy-col { font-size: 1.4vw; }
 
-    /* Cabezas más compacta */
-    body.modo-tv .cabezas-table th { padding: 0.5vh 1vw; font-size: 0.85vw; }
-    body.modo-tv .cabezas-table th .dia-nombre { font-size: 0.9vw; }
-    body.modo-tv .cabezas-table th .dia-fecha { font-size: 0.7vw; }
-    body.modo-tv .cabezas-table td { padding: 0.5vh 1vw; font-size: 1.6vw; }
-    body.modo-tv .cabezas-table td.col-turno { font-size: 0.85vw; }
-    body.modo-tv .cabezas-table td.hoy-col { font-size: 1.9vw; }
+    /* Turnos grandes en modo TV */
+    body.modo-tv .turnos-grid { gap: 0.7vw; height: 100%; align-content: stretch; }
+    body.modo-tv .turno-card { border-radius: 5px; }
+    body.modo-tv .turno-header { padding: 0.7vh 0.8vw; border-bottom-width: 2px; }
+    body.modo-tv .turno-nombre { font-size: 1.5vw; }
+    body.modo-tv .turno-hora { font-size: 0.9vw; }
+    body.modo-tv .turno-sorteo { font-size: 0.65vw; padding: 2px 0.8vw 3px; }
+    body.modo-tv .numero-item { padding: 0; flex: 1; }
+    body.modo-tv .numero-pos { font-size: 0.6vw; margin-bottom: 1px; }
 
-    /* Turnos más compactos */
-    body.modo-tv .turnos-grid { gap: 0.8vw; height: 100%; }
-    body.modo-tv .turno-card { border-radius: 4px; }
-    body.modo-tv .turno-header { padding: 0.5vh 0.8vw; }
-    body.modo-tv .turno-nombre { font-size: 0.9vw; }
-    body.modo-tv .turno-hora { font-size: 0.65vw; }
-    body.modo-tv .turno-sorteo { font-size: 0.6vw; padding: 2px 0.8vw 3px; }
-    body.modo-tv .numero-item { padding: 0.4vh 0; }
-    body.modo-tv .numero-pos { font-size: 0.45vw; }
-    body.modo-tv .numero-val { font-size: 1.15vw; }
-    body.modo-tv .numero-item:nth-child(1) .numero-val { font-size: 1.5vw; }
-    body.modo-tv .numero-item:nth-child(2) .numero-val { font-size: 1.3vw; }
-    body.modo-tv .numero-item:nth-child(3) .numero-val { font-size: 1.2vw; }
+    /* Números MUY grandes en modo TV */
+    body.modo-tv .numero-val { font-size: 2.4vw; }
+    body.modo-tv .numero-item:nth-child(1) .numero-val { font-size: 3.2vw; }
+    body.modo-tv .numero-item:nth-child(2) .numero-val { font-size: 2.8vw; }
+    body.modo-tv .numero-item:nth-child(3) .numero-val { font-size: 2.6vw; }
 
-    body.modo-tv footer {
-      height: 5vh;
-      padding: 0 3vw;
-    }
-    body.modo-tv .footer-agencia { font-size: 0.9vw; }
-    body.modo-tv .footer-source { font-size: 0.7vw; }
-    body.modo-tv .footer-tel { font-size: 0.9vw; }
+    body.modo-tv footer { height: 4.5vh; padding: 0 2.5vw; }
+    body.modo-tv .footer-agencia,
+    body.modo-tv .footer-tel { font-size: 0.85vw; }
+    body.modo-tv .footer-source { font-size: 0.65vw; }
 
-    /* Botón salir modo TV */
+    /* Botón salir — casi invisible */
     .btn-salir-tv {
-      display: none;
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      z-index: 999;
-      background: rgba(0,0,0,0.7);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      padding: 6px 14px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 0.85vw;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: opacity 0.3s;
-      opacity: 0.3;
+      display: none; position: fixed; top: 10px; right: 10px; z-index: 999;
+      background: rgba(0,0,0,0.6); color: var(--accent); border: 1px solid var(--accent);
+      border-radius: 4px; padding: 4px 12px; font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 0.8vw; letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; opacity: 0.15; transition: opacity 0.3s;
     }
     .btn-salir-tv:hover { opacity: 1; }
     body.modo-tv .btn-salir-tv { display: block; }
-    body.modo-tv .btn-tv { display: none; }
   </style>
 </head>
 <body>
 
-<button class="btn-salir-tv" onclick="salirModoTV()" title="Salir del modo TV">✕ Salir</button>
+<button class="btn-salir-tv" onclick="salirModoTV()">✕ Salir</button>
 
 <header>
   <div class="header-left">
@@ -254,9 +215,7 @@
       <span id="last-update">Cargando…</span>
     </div>
     <div class="fecha-actual" id="fecha-actual">—</div>
-    <button class="btn-tv" onclick="activarModoTV()">
-      <span class="icon">📺</span> Modo TV
-    </button>
+    <button class="btn-tv" onclick="activarModoTV()">📺 Modo TV</button>
   </div>
 </header>
 
@@ -272,8 +231,8 @@
     <div class="section-header"><h2>Cabezas — últimos 5 días</h2></div>
     <div class="cabezas-wrap">
       <div id="cabezas-container">
-        <div style="color:var(--muted);padding:20px 0;text-align:center">
-          <div class="spinner" style="margin-bottom:8px"></div>Cargando historial…
+        <div style="color:var(--muted);padding:16px 0;text-align:center">
+          <div class="spinner" style="margin-bottom:6px"></div>Cargando historial…
         </div>
       </div>
     </div>
@@ -282,10 +241,7 @@
   <div>
     <div class="section-header"><h2 id="titulo-resultados">Resultados del día</h2></div>
     <div class="turnos-grid" id="turnos-grid">
-      <div class="status-msg">
-        <div class="spinner"></div>
-        <p>Obteniendo resultados…</p>
-      </div>
+      <div class="status-msg"><div class="spinner"></div><p>Obteniendo resultados…</p></div>
     </div>
   </div>
 </main>
@@ -298,11 +254,9 @@
 
 <script>
   const API_BASE = window.location.hostname === "localhost"
-    ? "http://localhost:5000/api/quiniela"
-    : "/api/quiniela";
+    ? "http://localhost:5000/api/quiniela" : "/api/quiniela";
   const API_CABEZAS = window.location.hostname === "localhost"
-    ? "http://localhost:5000/api/cabezas"
-    : "/api/cabezas";
+    ? "http://localhost:5000/api/cabezas" : "/api/cabezas";
 
   const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const ORDEN_TURNOS = ["La Primera","Matutino","Vespertino","De la Tarde","Nocturno"];
@@ -312,80 +266,46 @@
   function isoAApi(iso) { const [yyyy,mm,dd]=iso.split('-'); return `${dd}-${mm}-${yyyy}`; }
   function ddmmyyyyAISO(f) { const [dd,mm,yyyy]=f.split('/'); return `${yyyy}-${mm}-${dd}`; }
 
-  // ── MODO TV ──
-  function activarModoTV() {
-    document.body.classList.add('modo-tv');
-    localStorage.setItem('modoTV', '1');
-  }
+  function activarModoTV() { document.body.classList.add('modo-tv'); localStorage.setItem('modoTV','1'); }
+  function salirModoTV() { document.body.classList.remove('modo-tv'); localStorage.removeItem('modoTV'); }
+  if (localStorage.getItem('modoTV')) document.body.classList.add('modo-tv');
 
-  function salirModoTV() {
-    document.body.classList.remove('modo-tv');
-    localStorage.removeItem('modoTV');
-  }
-
-  // Restaurar modo TV si estaba activo
-  if (localStorage.getItem('modoTV')) {
-    document.body.classList.add('modo-tv');
-  }
-
-  // ── CABEZAS ──
   async function cargarCabezas() {
     try {
       const res = await fetch(API_CABEZAS);
       const data = await res.json();
       renderCabezas(data.dias || []);
     } catch(e) {
-      document.getElementById('cabezas-container').innerHTML =
-        `<p style="color:var(--muted);padding:16px">No se pudo cargar el historial.</p>`;
+      document.getElementById('cabezas-container').innerHTML = `<p style="color:var(--muted);padding:12px">No se pudo cargar el historial.</p>`;
     }
   }
 
   function renderCabezas(dias) {
-    if (!dias.length) {
-      document.getElementById('cabezas-container').innerHTML =
-        `<p style="color:var(--muted);padding:16px">Sin datos históricos.</p>`;
-      return;
-    }
+    if (!dias.length) { document.getElementById('cabezas-container').innerHTML = `<p style="color:var(--muted);padding:12px">Sin datos.</p>`; return; }
     const turnosSet = new Set();
     dias.forEach(d => d.cabezas.forEach(c => turnosSet.add(c.turno)));
     const turnos = ORDEN_TURNOS.filter(t => turnosSet.has(t));
     const hoyStr = hoyISO();
 
-    const thead = `<thead><tr>
-      <th class="col-turno">Turno</th>
-      ${dias.map(d => {
-        const iso = ddmmyyyyAISO(d.fecha);
-        const esHoy = iso === hoyStr;
-        return `<th class="${esHoy?'hoy-col':''}">
-          <span class="dia-nombre">${d.dia_semana}${esHoy?' ★':''}</span>
-          <span class="dia-fecha">${d.fecha.substring(0,5)}</span>
-        </th>`;
-      }).join('')}
-    </tr></thead>`;
+    const thead = `<thead><tr><th class="col-turno">Turno</th>${dias.map(d=>{
+      const iso=ddmmyyyyAISO(d.fecha), esHoy=iso===hoyStr;
+      return `<th class="${esHoy?'hoy-col':''}"><span class="dia-nombre">${d.dia_semana}${esHoy?' ★':''}</span><span class="dia-fecha">${d.fecha.substring(0,5)}</span></th>`;
+    }).join('')}</tr></thead>`;
 
-    const tbody = `<tbody>${turnos.map(turno=>`
-      <tr>
-        <td class="col-turno">${turno}</td>
-        ${dias.map(d=>{
-          const iso=ddmmyyyyAISO(d.fecha);
-          const esHoy=iso===hoyStr;
-          const c=d.cabezas.find(x=>x.turno===turno);
-          return c?`<td class="${esHoy?'hoy-col':''}">${c.numero}</td>`:`<td class="vacio">—</td>`;
-        }).join('')}
-      </tr>`).join('')}
-    </tbody>`;
+    const tbody = `<tbody>${turnos.map(turno=>`<tr><td class="col-turno">${turno}</td>${dias.map(d=>{
+      const iso=ddmmyyyyAISO(d.fecha), esHoy=iso===hoyStr;
+      const c=d.cabezas.find(x=>x.turno===turno);
+      return c?`<td class="${esHoy?'hoy-col':''}">${c.numero}</td>`:`<td class="vacio">—</td>`;
+    }).join('')}</tr>`).join('')}</tbody>`;
 
-    document.getElementById('cabezas-container').innerHTML =
-      `<table class="cabezas-table">${thead}${tbody}</table>`;
+    document.getElementById('cabezas-container').innerHTML = `<table class="cabezas-table">${thead}${tbody}</table>`;
   }
 
-  // ── RESULTADOS ──
   function renderTurnos(data, fechaISO) {
     document.getElementById('fecha-actual').textContent = isoADisplay(fechaISO);
     document.getElementById('last-update').textContent = `Act. ${data.actualizado}`;
     const esHoy = fechaISO === hoyISO();
-    document.getElementById('titulo-resultados').textContent =
-      esHoy ? 'Resultados de hoy' : `Resultados del ${isoADisplay(fechaISO)}`;
+    document.getElementById('titulo-resultados').textContent = esHoy ? 'Resultados de hoy' : `Resultados del ${isoADisplay(fechaISO)}`;
 
     const grid = document.getElementById('turnos-grid');
     if (!data.turnos || !data.turnos.length) {
@@ -420,36 +340,27 @@
       if (!data.ok) throw new Error(data.error);
       renderTurnos(data, fechaISO);
     } catch(e) {
-      document.getElementById('turnos-grid').innerHTML =
-        `<div class="status-msg"><p>⚠️ No se pudo cargar.<br><small>${e.message}</small></p><button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button></div>`;
+      document.getElementById('turnos-grid').innerHTML = `<div class="status-msg"><p>⚠️ No se pudo cargar.<br><small>${e.message}</small></p><button class="refresh-btn" onclick="cargar('${fechaISO}')">Reintentar</button></div>`;
       document.getElementById('last-update').textContent = 'Error';
     }
   }
 
-  function buscarFecha() {
-    const val = document.getElementById('fecha-input').value;
-    if (!val) return;
-    cargar(val);
-  }
+  function buscarFecha() { const val=document.getElementById('fecha-input').value; if(!val)return; cargar(val); }
 
   function irAHoy() {
-    const hoy = hoyISO();
-    document.getElementById('fecha-input').value = hoy;
+    const hoy=hoyISO();
+    document.getElementById('fecha-input').value=hoy;
     cargar(hoy);
     clearInterval(window._refreshInterval);
-    window._refreshInterval = setInterval(()=>cargar(hoyISO()), 10*60*1000);
+    window._refreshInterval=setInterval(()=>cargar(hoyISO()),10*60*1000);
   }
 
-  const hoy = hoyISO();
-  document.getElementById('fecha-input').value = hoy;
-  document.getElementById('fecha-input').max = hoy;
+  const hoy=hoyISO();
+  document.getElementById('fecha-input').value=hoy;
+  document.getElementById('fecha-input').max=hoy;
   cargar(hoy);
   cargarCabezas();
-
-  window._refreshInterval = setInterval(()=>{
-    const f = document.getElementById('fecha-input').value;
-    if (f === hoyISO()) cargar(hoyISO());
-  }, 10*60*1000);
+  window._refreshInterval=setInterval(()=>{ if(document.getElementById('fecha-input').value===hoyISO()) cargar(hoyISO()); },10*60*1000);
 </script>
 </body>
 </html>
