@@ -49,7 +49,10 @@ def parsear_texto(soup, fecha_solicitada: str):
             continue
 
         if FECHA_RE.match(l):
-            continue  # ignorar todas las fechas del HTML
+            # Guardar la fecha del sorteo (primera fecha que aparece por turno)
+            if not current.get("fecha_real"):
+                current["fecha_real"] = l
+            continue
 
         if l.isdigit() and len(l) == 5 and not current["sorteo"] and not current["numeros"]:
             current["sorteo"] = l
@@ -69,7 +72,6 @@ def parsear(html: str, fecha_solicitada: str):
     soup = BeautifulSoup(html, "html.parser")
     turnos = []
 
-    # Intentar selector CSS del slider
     items = soup.select("#quiniela-Slider .item")
     for item in items:
         textos = [el.get_text(strip=True) for el in item.find_all(True) if el.get_text(strip=True)]
@@ -77,6 +79,7 @@ def parsear(html: str, fecha_solicitada: str):
         hora = None
         sorteo = None
         numeros = []
+        fecha_real = None
 
         for i, t in enumerate(textos):
             if t in ORDEN_TURNOS:
@@ -88,16 +91,22 @@ def parsear(html: str, fecha_solicitada: str):
                     sorteo = textos[i + 1]
                 except:
                     pass
+            elif t == "FECHA DE SORTEO:" and i + 1 < len(textos):
+                fecha_real = textos[i + 1]
             elif len(t) == 4 and t.isdigit() and len(numeros) < 20:
                 numeros.append(t)
 
         if nombre and numeros:
-            turnos.append({"nombre": nombre, "hora": hora or "", "sorteo": sorteo or "", "fecha": fecha_solicitada, "numeros": numeros})
+            turnos.append({
+                "nombre": nombre, "hora": hora or "", "sorteo": sorteo or "",
+                "fecha": fecha_solicitada, "fecha_real": fecha_real or fecha_solicitada,
+                "numeros": numeros
+            })
 
     if not turnos:
         turnos = parsear_texto(soup, fecha_solicitada)
 
-    # Deduplicar: quedarse con la entrada que tenga MÁS números por turno
+    # Deduplicar: quedarse con la entrada con más números
     vistos = {}
     for t in turnos:
         nombre = t["nombre"]
@@ -111,19 +120,21 @@ def parsear(html: str, fecha_solicitada: str):
 
 def tiene_datos_reales(turnos, fecha_solicitada: str):
     """
-    Verifica que los turnos encontrados correspondan a la fecha solicitada.
-    Estrategia: al menos un turno debe tener 20 números Y la fecha del primer
-    número en el HTML debe coincidir con la solicitada.
-    Si el sitio no tiene datos para esa fecha, el HTML no va a contener
-    ningún turno con 20 números relacionados a esa fecha.
-    Usamos una heurística: si hay turnos con hora registrada, son datos reales.
-    Si todos los turnos no tienen hora, probablemente son datos de otro día.
+    Verifica que los datos correspondan a la fecha solicitada.
+    Estrategia: compara la fecha_real de los turnos con la fecha solicitada.
+    Si el sitio devuelve datos de otro día, fecha_real será diferente.
     """
     if not turnos:
         return False
-    # Si al menos un turno tiene hora, son datos del día solicitado
-    con_hora = [t for t in turnos if t["hora"]]
-    return len(con_hora) > 0
+
+    con_fecha_real = [t for t in turnos if t.get("fecha_real")]
+    if not con_fecha_real:
+        # Sin fecha_real disponible, verificar al menos que tengan hora
+        return any(t["hora"] for t in turnos)
+
+    # Verificar que al menos un turno tenga fecha_real == fecha_solicitada
+    coinciden = [t for t in con_fecha_real if t.get("fecha_real") == fecha_solicitada]
+    return len(coinciden) > 0
 
 
 @app.route("/api/quiniela")
@@ -219,6 +230,7 @@ def debug_fecha(fecha):
             "turnos": [{
                 "nombre": t["nombre"],
                 "hora": t["hora"],
+                "fecha_real": t.get("fecha_real", ""),
                 "numeros_count": len(t["numeros"]),
                 "primer_numero": t["numeros"][0] if t["numeros"] else None
             } for t in turnos]
