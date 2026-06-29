@@ -33,25 +33,13 @@ def extraer_fecha_real(html: str) -> str:
 
 
 def parsear_texto(soup, fecha_solicitada: str):
-    """
-    Parsea el texto plano de la página.
-    Estructura típica por turno:
-      Nombre turno
-      DD/MM/YYYY         ← fecha del sorteo
-      [DD/MM/YYYY ...]   ← otras fechas del calendario (ignorar)
-      HH:MM:SS           ← hora (opcional, puede no estar)
-      NNNNN              ← nro de sorteo (5 dígitos)
-      NNNN x20           ← números premiados
-    """
     texto = soup.get_text(separator="\n")
     lineas = [l.strip() for l in texto.splitlines() if l.strip()]
 
     turnos = []
     current = None
-    capturando_numeros = False
 
     for l in lineas:
-        # Detectar inicio de turno
         if l in ORDEN_TURNOS:
             if current and current["numeros"]:
                 turnos.append(current)
@@ -62,33 +50,27 @@ def parsear_texto(soup, fecha_solicitada: str):
                 "fecha": fecha_solicitada,
                 "numeros": []
             }
-            capturando_numeros = False
             continue
 
         if current is None:
             continue
 
-        # Hora del sorteo
         if HORA_RE.match(l):
             current["hora"] = l[:5]
             continue
 
-        # Fecha → guardar solo la primera (fecha del sorteo), ignorar las demás
+        # Ignorar fechas — no las usamos para validar
         if FECHA_RE.match(l):
-            if not current["fecha"] or current["fecha"] == fecha_solicitada:
-                current["fecha"] = l
             continue
 
-        # Número de sorteo (5 dígitos) — viene antes de los premiados
-        if l.isdigit() and len(l) == 5 and not current["sorteo"] and not capturando_numeros:
+        # Número de sorteo (5 dígitos)
+        if l.isdigit() and len(l) == 5 and not current["sorteo"] and not current["numeros"]:
             current["sorteo"] = l
-            capturando_numeros = True
             continue
 
         # Números premiados (4 dígitos)
         if l.isdigit() and len(l) == 4 and len(current["numeros"]) < 20:
             current["numeros"].append(l)
-            capturando_numeros = True
             continue
 
     if current and current["numeros"]:
@@ -99,11 +81,10 @@ def parsear_texto(soup, fecha_solicitada: str):
 
 def parsear(html: str, fecha_solicitada: str):
     soup = BeautifulSoup(html, "html.parser")
-
-    # Intentar por selector CSS del slider
     turnos = []
-    items = soup.select("#quiniela-Slider .item")
 
+    # Intentar selector CSS del slider
+    items = soup.select("#quiniela-Slider .item")
     for item in items:
         textos = [el.get_text(strip=True) for el in item.find_all(True) if el.get_text(strip=True)]
         nombre = None
@@ -136,38 +117,44 @@ def parsear(html: str, fecha_solicitada: str):
                 "numeros": numeros
             })
 
-    # Fallback: parseo de texto plano
     if not turnos:
-        print(f"[parsear] slider vacío, usando parseo de texto plano")
         turnos = parsear_texto(soup, fecha_solicitada)
 
-    turnos.sort(key=lambda t: ORDEN_TURNOS.index(t["nombre"]) if t["nombre"] in ORDEN_TURNOS else 99)
-    return turnos
-
-
-def deduplicar_turnos(turnos):
+    # Deduplicar: si hay dos entradas del mismo turno, quedarse con la que tiene MÁS números
     vistos = {}
     for t in turnos:
         nombre = t["nombre"]
         if nombre not in vistos:
             vistos[nombre] = t
         else:
-            if not vistos[nombre]["hora"] and t["hora"]:
+            # Preferir la que tiene más números
+            if len(t["numeros"]) > len(vistos[nombre]["numeros"]):
                 vistos[nombre] = t
-    return [vistos[n] for n in ORDEN_TURNOS if n in vistos]
+            # Si igual cantidad, preferir la que tiene hora
+            elif len(t["numeros"]) == len(vistos[nombre]["numeros"]) and t["hora"] and not vistos[nombre]["hora"]:
+                vistos[nombre] = t
+
+    # Forzar fecha solicitada en todos los turnos (ignorar fechas raras del HTML)
+    resultado = []
+    for nombre in ORDEN_TURNOS:
+        if nombre in vistos:
+            t = vistos[nombre]
+            t["fecha"] = fecha_solicitada  # normalizar fecha
+            resultado.append(t)
+
+    return resultado
 
 
 def fetch_quiniela(fecha: str):
     html = fetch_html(fecha)
     fecha_real = extraer_fecha_real(html)
 
-    # Si el sitio devuelve datos de otra fecha, no hay resultados para la solicitada
+    # Si el sitio devuelve datos de otra fecha, no hay resultados
     if fecha_real and fecha_real != fecha:
         print(f"[fetch] Sitio devolvió {fecha_real} para {fecha} — sin datos")
         return [], fecha_real
 
     turnos = parsear(html, fecha)
-    turnos = deduplicar_turnos(turnos)
     return turnos, fecha
 
 
@@ -230,7 +217,7 @@ def cabezas_ultimos_dias():
                 })
                 print(f"[cabezas] OK {fecha_str} — {len(cabezas)} turnos")
             else:
-                print(f"[cabezas] Sin datos para {fecha_str}, saltando")
+                print(f"[cabezas] Sin datos para {fecha_str} (sitio devolvió {fecha_real}), saltando")
         except Exception as e:
             print(f"[cabezas] ERROR {fecha_str}: {e}")
 
@@ -248,7 +235,7 @@ def debug_fecha(fecha):
         fecha_real = extraer_fecha_real(html)
         soup = BeautifulSoup(html, "html.parser")
         items = soup.select("#quiniela-Slider .item")
-        turnos = parsear_texto(soup, fecha_fmt)
+        turnos = parsear(html, fecha_fmt)
         return jsonify({
             "fecha_solicitada": fecha_fmt,
             "fecha_real_en_html": fecha_real,
@@ -257,7 +244,6 @@ def debug_fecha(fecha):
             "turnos": [{
                 "nombre": t["nombre"],
                 "hora": t["hora"],
-                "fecha": t["fecha"],
                 "numeros_count": len(t["numeros"]),
                 "primer_numero": t["numeros"][0] if t["numeros"] else None
             } for t in turnos]
