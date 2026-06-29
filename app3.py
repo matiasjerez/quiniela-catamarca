@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import os
-import re
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -17,20 +16,24 @@ HEADERS = {
 }
 
 
-def fetch_html(fecha: str) -> str:
+def fetch_quiniela(fecha: str):
     url = f"{BASE_URL}?imputacion=0&fecha={fecha}"
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
-    return resp.text
+    turnos = parsear(resp.text, fecha)
+
+    # Verificar que los datos devueltos correspondan a la fecha solicitada
+    # El sitio a veces devuelve el último día disponible cuando no hay datos para la fecha pedida
+    if turnos:
+        fecha_real = turnos[0].get("fecha", "")
+        if fecha_real and fecha_real != fecha:
+            print(f"[fetch] Sitio devolvió fecha {fecha_real} en lugar de {fecha} — sin datos para esa fecha")
+            return []  # No hay datos para la fecha solicitada
+
+    return turnos
 
 
-def extraer_fecha_real(html: str) -> str:
-    """Extrae la primera fecha DD/MM/YYYY que aparece en el HTML."""
-    match = re.search(r'\b(\d{2}/\d{2}/\d{4})\b', html)
-    return match.group(1) if match else ""
-
-
-def parsear(html: str, fecha_solicitada: str):
+def parsear(html: str, fecha: str):
     soup = BeautifulSoup(html, "html.parser")
     turnos = []
     items = soup.select("#quiniela-Slider .item")
@@ -63,12 +66,12 @@ def parsear(html: str, fecha_solicitada: str):
                 "nombre": nombre,
                 "hora": hora or "",
                 "sorteo": sorteo or "",
-                "fecha": fecha_sorteo or fecha_solicitada,
+                "fecha": fecha_sorteo or fecha,
                 "numeros": numeros
             })
 
     if not turnos:
-        turnos = parsear_texto(soup, fecha_solicitada)
+        turnos = parsear_texto(soup, fecha)
 
     turnos.sort(key=lambda t: ORDEN_TURNOS.index(t["nombre"]) if t["nombre"] in ORDEN_TURNOS else 99)
     return turnos
@@ -93,7 +96,7 @@ def parsear_texto(soup, fecha):
             current["sorteo"] = l
         elif l.isdigit() and len(l) == 4 and len(current["numeros"]) < 20:
             current["numeros"].append(l)
-        elif re.match(r'^\d{2}/\d{2}/\d{4}$', l):
+        elif "/" in l and len(l) == 10:
             current["fecha"] = l
 
     if current and current["numeros"]:
@@ -103,6 +106,7 @@ def parsear_texto(soup, fecha):
 
 
 def deduplicar_turnos(turnos):
+    """Si hay dos entradas del mismo turno, quedarse con la que tiene hora."""
     vistos = {}
     for t in turnos:
         nombre = t["nombre"]
@@ -111,54 +115,16 @@ def deduplicar_turnos(turnos):
         else:
             if not vistos[nombre]["hora"] and t["hora"]:
                 vistos[nombre] = t
-    return [vistos[n] for n in ORDEN_TURNOS if n in vistos]
-
-
-def fetch_quiniela(fecha: str):
-    html = fetch_html(fecha)
-
-    # Detectar si el sitio devolvió datos de otra fecha
-    fecha_real = extraer_fecha_real(html)
-    if fecha_real and fecha_real != fecha:
-        print(f"[fetch] Sitio devolvió fecha {fecha_real} para solicitud {fecha} — sin datos")
-        return [], fecha_real  # sin datos para esa fecha
-
-    turnos = parsear(html, fecha)
-    turnos = deduplicar_turnos(turnos)
-    return turnos, fecha
-
-
-@app.route("/api/debug/<fecha>")
-def debug_fecha(fecha):
-    """Endpoint temporal para diagnosticar el parseo."""
-    fecha_fmt = fecha.replace("-", "/")
-    try:
-        html = fetch_html(fecha_fmt)
-        fecha_real = extraer_fecha_real(html)
-        soup = BeautifulSoup(html, "html.parser")
-        items = soup.select("#quiniela-Slider .item")
-        texto_plano = soup.get_text(separator="\n")
-        lineas = [l.strip() for l in texto_plano.splitlines() if l.strip()]
-        # Buscar líneas relevantes
-        relevantes = [l for l in lineas if l in ORDEN_TURNOS or 
-                      (l.isdigit() and len(l) == 4) or
-                      re.match(r'^\d{2}/\d{2}/\d{4}$', l) or
-                      re.match(r'^\d{2}:\d{2}:\d{2}$', l)]
-        return jsonify({
-            "fecha_solicitada": fecha_fmt,
-            "fecha_real_en_html": fecha_real,
-            "items_slider": len(items),
-            "lineas_relevantes": relevantes[:60]
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    resultado = [vistos[n] for n in ORDEN_TURNOS if n in vistos]
+    return resultado
 
 
 @app.route("/api/quiniela")
 def quiniela_hoy():
     fecha = datetime.now().strftime("%d/%m/%Y")
     try:
-        turnos, _ = fetch_quiniela(fecha)
+        turnos = fetch_quiniela(fecha)
+        turnos = deduplicar_turnos(turnos)
         return jsonify({
             "ok": True,
             "fecha": fecha,
@@ -174,7 +140,8 @@ def quiniela_hoy():
 def quiniela_fecha(fecha):
     fecha_fmt = fecha.replace("-", "/")
     try:
-        turnos, _ = fetch_quiniela(fecha_fmt)
+        turnos = fetch_quiniela(fecha_fmt)
+        turnos = deduplicar_turnos(turnos)
         return jsonify({
             "ok": True,
             "fecha": fecha_fmt,
@@ -188,6 +155,7 @@ def quiniela_fecha(fecha):
 
 @app.route("/api/cabezas")
 def cabezas_ultimos_dias():
+    """Devuelve las cabezas de los últimos 5 días que TIENEN datos reales."""
     resultado = []
     dia = datetime.now()
     intentos = 0
@@ -200,7 +168,9 @@ def cabezas_ultimos_dias():
 
         fecha_str = dia.strftime("%d/%m/%Y")
         try:
-            turnos, fecha_real = fetch_quiniela(fecha_str)
+            turnos = fetch_quiniela(fecha_str)
+            turnos = deduplicar_turnos(turnos)
+            # Solo agregar si hay datos reales para esa fecha
             if turnos:
                 cabezas = [
                     {"turno": t["nombre"], "numero": t["numeros"][0], "hora": t["hora"]}
@@ -211,11 +181,11 @@ def cabezas_ultimos_dias():
                     "dia_semana": ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][dia.weekday()],
                     "cabezas": cabezas
                 })
-                print(f"[cabezas] OK {fecha_str} — {len(cabezas)} turnos")
+                print(f"[cabezas] OK fecha={fecha_str} ({len(cabezas)} turnos)")
             else:
-                print(f"[cabezas] Sin datos para {fecha_str} (sitio devolvió {fecha_real}), saltando")
+                print(f"[cabezas] Sin datos para fecha={fecha_str}, saltando")
         except Exception as e:
-            print(f"[cabezas] ERROR {fecha_str}: {e}")
+            print(f"[cabezas] ERROR fecha={fecha_str}: {e}")
 
         dia -= timedelta(days=1)
         intentos += 1
