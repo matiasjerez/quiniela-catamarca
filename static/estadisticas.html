@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas — Agencia 553</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #0a0d14;
+      --surface: #111620;
+      --surface2: #161d2e;
+      --border: #1e2a42;
+      --accent: #e8b84b;
+      --gold2: #f5d07a;
+      --text: #eef0f6;
+      --muted: #5a6680;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --blue: #3498db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(90deg, #0a0d14 0%, #111d35 50%, #0a0d14 100%);
+      border-bottom: 3px solid var(--accent);
+      padding: 0 3vw; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .logo span { color: var(--accent); }
+
+    .nav-link {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+      text-decoration: none; border: 1px solid var(--border); border-radius: 3px;
+      padding: 6px 16px; transition: all 0.2s;
+    }
+    .nav-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; }
+
+    /* CONTROLES */
+    .controles {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 32px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 16px 20px;
+    }
+
+    .controles label { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+    select {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 3px; padding: 7px 14px; font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem; outline: none; cursor: pointer;
+    }
+    select:focus { border-color: var(--accent); }
+
+    .btn-analizar {
+      background: var(--accent); color: #000; border: none; border-radius: 4px;
+      padding: 8px 24px; font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900; font-size: 1rem; letter-spacing: 0.1em;
+      text-transform: uppercase; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-analizar:hover { background: var(--gold2); }
+    .btn-analizar:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+    .advertencia {
+      background: rgba(232,184,75,0.08); border: 1px solid rgba(232,184,75,0.3);
+      border-radius: 4px; padding: 10px 16px;
+      font-size: 0.8rem; color: var(--muted); line-height: 1.5;
+      flex: 1; min-width: 200px;
+    }
+    .advertencia strong { color: var(--accent); }
+
+    /* RESUMEN */
+    .resumen-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px; margin-bottom: 32px;
+    }
+
+    .resumen-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 16px 20px;
+    }
+
+    .resumen-card .valor {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 2rem;
+      font-weight: 900; color: var(--accent); line-height: 1;
+    }
+
+    .resumen-card .etiqueta {
+      font-size: 0.75rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-top: 4px;
+    }
+
+    /* SECCIONES */
+    .section-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .section-header h2 {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);
+    }
+    .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+    /* TABLA TOP CANDIDATOS */
+    .tabla-wrap { overflow-x: auto; margin-bottom: 40px; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { background: var(--surface2); }
+    th {
+      padding: 10px 16px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); text-align: left;
+      border-bottom: 2px solid var(--accent);
+    }
+    th.center { text-align: center; }
+
+    td {
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; color: var(--text);
+    }
+    td.center { text-align: center; }
+
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    tr:hover td { background: rgba(232,184,75,0.04); }
+
+    .numero-destacado {
+      font-size: 1.6rem; font-weight: 900; color: var(--accent);
+      text-shadow: 0 0 12px rgba(232,184,75,0.4);
+    }
+
+    .rank-1 td { background: rgba(232,184,75,0.08) !important; }
+    .rank-2 td { background: rgba(232,184,75,0.05) !important; }
+    .rank-3 td { background: rgba(232,184,75,0.03) !important; }
+
+    .badge-rank {
+      display: inline-block; width: 28px; height: 28px; line-height: 28px;
+      text-align: center; border-radius: 50%; font-size: 0.85rem; font-weight: 700;
+    }
+    .rank-1 .badge-rank { background: var(--accent); color: #000; }
+    .rank-2 .badge-rank { background: #c0c8e0; color: #000; }
+    .rank-3 .badge-rank { background: #9aa3bd; color: #000; }
+
+    /* BARRA DE SCORE */
+    .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .score-bar {
+      flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+    }
+    .score-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+    .score-val { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+
+    /* TERMINACIONES */
+    .terminaciones { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+
+    .term-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 14px 20px; text-align: center; min-width: 100px;
+      transition: border-color 0.2s;
+    }
+    .term-card:first-child { border-color: var(--accent); }
+
+    .term-num {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem;
+      font-weight: 900; color: var(--accent);
+    }
+    .term-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .term-veces { font-size: 0.85rem; color: var(--text); margin-top: 2px; }
+
+    /* PREDICCION DESTACADA */
+    .prediccion-box {
+      background: linear-gradient(135deg, #1a1500, #2e2000);
+      border: 2px solid var(--accent);
+      border-radius: 8px; padding: 24px 28px; margin-bottom: 40px;
+      display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+    }
+
+    .prediccion-titulo {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--muted); margin-bottom: 8px;
+    }
+
+    .prediccion-dia {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: 2rem; color: var(--accent);
+    }
+
+    .top3-numeros { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .top3-item {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--accent);
+      border-radius: 6px; padding: 12px 20px; text-align: center;
+    }
+
+    .top3-pos { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .top3-num {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 3rem;
+      font-weight: 900; color: var(--accent); line-height: 1;
+      text-shadow: 0 0 20px rgba(232,184,75,0.5);
+    }
+    .top3-score { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    /* LOADING / ESTADO */
+    .estado { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .disclaimer {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--muted); border-radius: 4px;
+      padding: 12px 16px; font-size: 0.8rem; color: var(--muted);
+      line-height: 1.6; margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Agencia <span>553</span> — Estadísticas</div>
+  <a class="nav-link" href="/">← Volver a resultados</a>
+</header>
+
+<main>
+
+  <!-- CONTROLES -->
+  <div class="controles">
+    <label for="sel-turno">Turno:</label>
+    <select id="sel-turno">
+      <option value="">Todos los turnos</option>
+      <option value="La Primera">La Primera</option>
+      <option value="Matutino">Matutino</option>
+      <option value="Vespertino">Vespertino</option>
+      <option value="De la Tarde">De la Tarde</option>
+      <option value="Nocturno">Nocturno</option>
+    </select>
+    <button class="btn-analizar" id="btn-analizar" onclick="analizar()">
+      🔍 Analizar historial
+    </button>
+    <div class="advertencia">
+      <strong>⚠️ Primera carga puede tardar 1-2 minutos</strong> — el sistema descarga hasta 365 días de historial del sitio oficial.
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div id="contenido">
+    <div class="estado">
+      <p style="font-size:1.1rem">Seleccioná un turno y presioná <strong style="color:var(--accent)">Analizar historial</strong> para ver los candidatos para mañana.</p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const API = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000/api/estadisticas'
+    : '/api/estadisticas';
+
+  async function analizar() {
+    const turno = document.getElementById('sel-turno').value;
+    const btn = document.getElementById('btn-analizar');
+    btn.disabled = true;
+    btn.textContent = '⏳ Analizando...';
+
+    document.getElementById('contenido').innerHTML = `
+      <div class="estado">
+        <div class="spinner"></div>
+        <p>Descargando historial y calculando estadísticas…<br>
+        <small style="color:var(--muted)">Esto puede tardar hasta 2 minutos la primera vez.</small></p>
+      </div>`;
+
+    try {
+      const url = turno ? `${API}?turno=${encodeURIComponent(turno)}` : API;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      renderEstadisticas(data);
+    } catch(e) {
+      document.getElementById('contenido').innerHTML = `
+        <div class="estado"><p>⚠️ Error: ${e.message}</p></div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔍 Analizar historial';
+    }
+  }
+
+  function renderEstadisticas(d) {
+    const top3 = d.top_candidatos.slice(0, 3);
+    const maxScore = d.top_candidatos[0]?.score || 1;
+
+    const html = `
+      <!-- PREDICCIÓN DESTACADA -->
+      <div class="prediccion-box">
+        <div>
+          <div class="prediccion-titulo">Candidatos para</div>
+          <div class="prediccion-dia">${d.dia_prediccion}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-top:4px">Turno: ${d.turno_filtro}</div>
+        </div>
+        <div class="top3-numeros">
+          ${top3.map((n, i) => `
+            <div class="top3-item">
+              <div class="top3-pos">${['★ 1° Candidato','2° Candidato','3° Candidato'][i]}</div>
+              <div class="top3-num">${n.numero}</div>
+              <div class="top3-score">Score: ${n.score}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <div class="valor">${d.total_sorteos_analizados}</div>
+          <div class="etiqueta">Sorteos analizados</div>
+        </div>
+        <div class="resumen-card">
+          <div class="valor">${d.dias_con_datos}</div>
+          <div class="etiqueta">Días con datos</div>
+        </div>
+        <div class="resumen-card">
+          <div class="valor" style="font-size:1.2rem">${d.fecha_inicio}</div>
+          <div class="etiqueta">Desde</div>
+        </div>
+        <div class="resumen-card">
+          <div class="valor" style="font-size:1.2rem">${d.fecha_fin}</div>
+          <div class="etiqueta">Hasta</div>
+        </div>
+      </div>
+
+      <!-- TERMINACIONES FRECUENTES -->
+      <div class="section-header"><h2>Terminaciones más frecuentes</h2></div>
+      <div class="terminaciones">
+        ${d.terminaciones_frecuentes.map((t, i) => `
+          <div class="term-card">
+            <div class="term-num">${t.terminacion}</div>
+            <div class="term-label">Terminación</div>
+            <div class="term-veces">${t.veces} veces</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- TABLA TOP 20 -->
+      <div class="section-header"><h2>Top 20 candidatos para mañana</h2></div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="center">#</th>
+              <th>Número</th>
+              <th class="center">Veces salió</th>
+              <th class="center">% Global</th>
+              <th class="center">Veces el ${d.dia_prediccion}</th>
+              <th class="center">% ese día</th>
+              <th class="center">Sorteos sin salir</th>
+              <th>Score combinado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${d.top_candidatos.map((n, i) => `
+              <tr class="${i < 3 ? 'rank-'+(i+1) : ''}">
+                <td class="center"><span class="badge-rank">${i+1}</span></td>
+                <td><span class="${i < 3 ? 'numero-destacado' : ''}">${n.numero}</span></td>
+                <td class="center">${n.frecuencia}</td>
+                <td class="center">${n.porcentaje_global}%</td>
+                <td class="center">${n.veces_manana_dow}</td>
+                <td class="center">${n.porcentaje_dow}%</td>
+                <td class="center">${n.sorteos_sin_salir}</td>
+                <td>
+                  <div class="score-bar-wrap">
+                    <div class="score-bar">
+                      <div class="score-bar-fill" style="width:${(n.score/maxScore*100).toFixed(1)}%"></div>
+                    </div>
+                    <span class="score-val">${n.score}</span>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="disclaimer">
+        <strong>Aviso importante:</strong> Este análisis es puramente estadístico y se basa en frecuencias históricas.
+        La quiniela es un juego de azar y los resultados pasados no garantizan resultados futuros.
+        El score combinado pondera: frecuencia histórica global (30%), frecuencia para ese día de la semana (35%),
+        días sin aparecer (20%) y terminación frecuente (15%). Usar como referencia orientativa solamente.
+      </div>
+    `;
+
+    document.getElementById('contenido').innerHTML = html;
+  }
+</script>
+
+</body>
+</html>
