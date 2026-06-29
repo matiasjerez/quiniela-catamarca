@@ -20,17 +20,7 @@ def fetch_quiniela(fecha: str):
     url = f"{BASE_URL}?imputacion=0&fecha={fecha}"
     resp = requests.get(url, headers=HEADERS, timeout=15)
     resp.raise_for_status()
-    turnos = parsear(resp.text, fecha)
-
-    # Verificar que los datos devueltos correspondan a la fecha solicitada
-    # El sitio a veces devuelve el último día disponible cuando no hay datos para la fecha pedida
-    if turnos:
-        fecha_real = turnos[0].get("fecha", "")
-        if fecha_real and fecha_real != fecha:
-            print(f"[fetch] Sitio devolvió fecha {fecha_real} en lugar de {fecha} — sin datos para esa fecha")
-            return []  # No hay datos para la fecha solicitada
-
-    return turnos
+    return parsear(resp.text, fecha)
 
 
 def parsear(html: str, fecha: str):
@@ -113,8 +103,10 @@ def deduplicar_turnos(turnos):
         if nombre not in vistos:
             vistos[nombre] = t
         else:
+            # Preferir el que tiene hora sobre el que no tiene
             if not vistos[nombre]["hora"] and t["hora"]:
                 vistos[nombre] = t
+    # Reordenar según orden oficial
     resultado = [vistos[n] for n in ORDEN_TURNOS if n in vistos]
     return resultado
 
@@ -129,7 +121,6 @@ def quiniela_hoy():
             "ok": True,
             "fecha": fecha,
             "turnos": turnos,
-            "sin_datos": len(turnos) == 0,
             "actualizado": datetime.now().strftime("%H:%M:%S")
         })
     except Exception as e:
@@ -146,7 +137,6 @@ def quiniela_fecha(fecha):
             "ok": True,
             "fecha": fecha_fmt,
             "turnos": turnos,
-            "sin_datos": len(turnos) == 0,
             "actualizado": datetime.now().strftime("%H:%M:%S")
         })
     except Exception as e:
@@ -155,7 +145,6 @@ def quiniela_fecha(fecha):
 
 @app.route("/api/cabezas")
 def cabezas_ultimos_dias():
-    """Devuelve las cabezas de los últimos 5 días que TIENEN datos reales."""
     resultado = []
     dia = datetime.now()
     intentos = 0
@@ -170,7 +159,6 @@ def cabezas_ultimos_dias():
         try:
             turnos = fetch_quiniela(fecha_str)
             turnos = deduplicar_turnos(turnos)
-            # Solo agregar si hay datos reales para esa fecha
             if turnos:
                 cabezas = [
                     {"turno": t["nombre"], "numero": t["numeros"][0], "hora": t["hora"]}
@@ -181,9 +169,6 @@ def cabezas_ultimos_dias():
                     "dia_semana": ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"][dia.weekday()],
                     "cabezas": cabezas
                 })
-                print(f"[cabezas] OK fecha={fecha_str} ({len(cabezas)} turnos)")
-            else:
-                print(f"[cabezas] Sin datos para fecha={fecha_str}, saltando")
         except Exception as e:
             print(f"[cabezas] ERROR fecha={fecha_str}: {e}")
 
