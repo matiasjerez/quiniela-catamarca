@@ -249,7 +249,7 @@
       🔍 Analizar historial
     </button>
     <div class="advertencia">
-      <strong>⚠️ Primera carga puede tardar 1-2 minutos</strong> — el sistema descarga hasta 365 días de historial del sitio oficial.
+      <strong>⚠️ Primera carga puede tardar 30-60 segundos</strong> — el sistema descarga hasta 45 días de historial del sitio oficial.
     </div>
   </div>
 
@@ -282,13 +282,31 @@
 
     try {
       const url = turno ? `${API}?turno=${encodeURIComponent(turno)}` : API;
-      const res = await fetch(url);
-      const data = await res.json();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 110000); // 110s timeout
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        throw new Error(`El servidor respondió con error ${res.status}. Puede que el análisis haya tardado demasiado.`);
+      }
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch(parseErr) {
+        throw new Error('La respuesta del servidor llegó incompleta (timeout). Probá nuevamente o elegí un turno específico en lugar de "Todos".');
+      }
+
       if (!data.ok) throw new Error(data.error);
       renderEstadisticas(data);
     } catch(e) {
+      const msg = e.name === 'AbortError'
+        ? 'El análisis tardó demasiado y se canceló. Probá seleccionando un turno específico en lugar de "Todos los turnos".'
+        : e.message;
       document.getElementById('contenido').innerHTML = `
-        <div class="estado"><p>⚠️ Error: ${e.message}</p></div>`;
+        <div class="estado"><p>⚠️ ${msg}</p></div>`;
     } finally {
       btn.disabled = false;
       btn.textContent = '🔍 Analizar historial';

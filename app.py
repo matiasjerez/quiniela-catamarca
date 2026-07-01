@@ -239,71 +239,57 @@ def debug_fecha(fecha):
         return jsonify({"error": str(e)}), 500
 
 
-
-@app.route("/estadisticas")
-def estadisticas_page():
-    return send_from_directory(app.static_folder, "estadisticas.html")
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    if path and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, "index.html")
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    print(f"🎲 Quiniela Catamarca corriendo en http://localhost:{port}")
-    app.run(debug=False, host="0.0.0.0", port=port)
-
-
-# ── ESTADÍSTICAS ─────────────────────────────────────────────────────────────
-
 from collections import Counter
 import math
 
-def fetch_historial(dias_max=365):
-    """Descarga el historial de cabezas día por día hasta días_max días atrás."""
-    historial = []  # [{fecha, dia_semana, turno, numero}]
-    dia = datetime.now() - timedelta(days=1)  # empezar desde ayer
-    intentos = 0
-    sin_datos_consecutivos = 0
+def fetch_dia(fecha_str, dow):
+    """Descarga y parsea un día. Retorna lista de registros o []."""
+    try:
+        html = fetch_html(fecha_str)
+        turnos = parsear(html, fecha_str)
+        if not tiene_datos_reales(turnos, fecha_str):
+            return []
+        registros = []
+        for t in turnos:
+            if t["numeros"]:
+                registros.append({
+                    "fecha": fecha_str,
+                    "dia_semana": dow,
+                    "turno": t["nombre"],
+                    "cabeza": t["numeros"][0],
+                    "todos": t["numeros"]
+                })
+        return registros
+    except Exception as e:
+        print(f"[historial] ERROR {fecha_str}: {e}")
+        return []
 
-    while intentos < dias_max:
-        if dia.weekday() == 6:  # domingo
-            dia -= timedelta(days=1)
-            continue
 
-        fecha_str = dia.strftime("%d/%m/%Y")
-        try:
-            html = fetch_html(fecha_str)
-            turnos = parsear(html, fecha_str)
-            valido = tiene_datos_reales(turnos, fecha_str)
+def fetch_historial(dias_max=45):
+    """Descarga el historial en paralelo usando threads."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-            if valido and turnos:
-                sin_datos_consecutivos = 0
-                for t in turnos:
-                    if t["numeros"]:
-                        historial.append({
-                            "fecha": fecha_str,
-                            "dia_semana": dia.weekday(),  # 0=lun..6=dom
-                            "turno": t["nombre"],
-                            "cabeza": t["numeros"][0],
-                            "todos": t["numeros"]
-                        })
-            else:
-                sin_datos_consecutivos += 1
-                # Si llevamos 10 días consecutivos sin datos, probablemente llegamos al límite
-                if sin_datos_consecutivos >= 10:
-                    print(f"[historial] 10 días sin datos consecutivos, deteniendo en {fecha_str}")
-                    break
-        except Exception as e:
-            print(f"[historial] ERROR {fecha_str}: {e}")
-
+    # Armar lista de fechas a consultar (sin domingos)
+    fechas = []
+    dia = datetime.now() - timedelta(days=1)
+    for _ in range(dias_max + 10):
+        if dia.weekday() != 6:  # saltar domingos
+            fechas.append((dia.strftime("%d/%m/%Y"), dia.weekday()))
         dia -= timedelta(days=1)
-        intentos += 1
+        if len(fechas) >= dias_max:
+            break
 
+    historial = []
+    # 10 workers en paralelo — reduce tiempo de ~90s a ~10s
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futuros = {executor.submit(fetch_dia, f, dow): f for f, dow in fechas}
+        for futuro in as_completed(futuros):
+            registros = futuro.result()
+            historial.extend(registros)
+
+    # Ordenar por fecha descendente
+    historial.sort(key=lambda x: x["fecha"], reverse=True)
+    print(f"[historial] Total recolectado: {len(historial)} registros de {len(fechas)} días")
     return historial
 
 
@@ -413,13 +399,16 @@ def calcular_estadisticas(historial, turno_filtro=None):
         "top_candidatos": top
     }
 
+@app.route("/estadisticas")
+def estadisticas_page():
+    return send_from_directory(app.static_folder, "estadisticas.html")
 
 @app.route("/api/estadisticas")
 def estadisticas():
     turno = request.args.get("turno", None)
     try:
         print(f"[estadisticas] Descargando historial...")
-        historial = fetch_historial(dias_max=365)
+        historial = fetch_historial(dias_max=45)
         print(f"[estadisticas] {len(historial)} registros descargados")
         stats = calcular_estadisticas(historial, turno_filtro=turno)
         stats["turno_filtro"] = turno or "Todos"
@@ -427,3 +416,15 @@ def estadisticas():
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    if path and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, "index.html")
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    print(f"🎲 Quiniela Catamarca corriendo en http://localhost:{port}")
+    app.run(debug=False, host="0.0.0.0", port=port)
