@@ -2,9 +2,16 @@ from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 import re
+
+# Zona horaria Argentina (UTC-3, sin horario de verano)
+TZ_ARG = timezone(timedelta(hours=-3))
+
+def now_arg():
+    """Retorna el datetime actual en hora de Argentina."""
+    return datetime.now(TZ_ARG)
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -139,7 +146,7 @@ def tiene_datos_reales(turnos, fecha_solicitada: str):
 
 @app.route("/api/quiniela")
 def quiniela_hoy():
-    fecha = datetime.now().strftime("%d/%m/%Y")
+    fecha = now_arg().strftime("%d/%m/%Y")
     try:
         html = fetch_html(fecha)
         turnos = parsear(html, fecha)
@@ -149,7 +156,7 @@ def quiniela_hoy():
             "fecha": fecha,
             "turnos": turnos if valido else [],
             "sin_datos": not valido,
-            "actualizado": datetime.now().strftime("%H:%M:%S")
+            "actualizado": now_arg().strftime("%H:%M:%S")
         })
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
@@ -167,7 +174,7 @@ def quiniela_fecha(fecha):
             "fecha": fecha_fmt,
             "turnos": turnos if valido else [],
             "sin_datos": not valido,
-            "actualizado": datetime.now().strftime("%H:%M:%S")
+            "actualizado": now_arg().strftime("%H:%M:%S")
         })
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
@@ -176,7 +183,7 @@ def quiniela_fecha(fecha):
 @app.route("/api/cabezas")
 def cabezas_ultimos_dias():
     resultado = []
-    dia = datetime.now()
+    dia = now_arg()
     intentos = 0
 
     while len(resultado) < 5 and intentos < 14:
@@ -271,7 +278,7 @@ def fetch_historial(dias_max=45):
 
     # Armar lista de fechas a consultar (sin domingos)
     fechas = []
-    dia = datetime.now() - timedelta(days=1)
+    dia = now_arg() - timedelta(days=1)
     for _ in range(dias_max + 10):
         if dia.weekday() != 6:  # saltar domingos
             fechas.append((dia.strftime("%d/%m/%Y"), dia.weekday()))
@@ -312,7 +319,7 @@ def calcular_estadisticas(historial, turno_filtro=None):
         return {}
 
     total = len(datos)
-    mañana_dow = (datetime.now().weekday() + 1) % 7
+    mañana_dow = (now_arg().weekday() + 1) % 7
 
     # Frecuencia global de cabezas
     freq_global = Counter(d["cabeza"] for d in datos)
